@@ -28,6 +28,9 @@ const playBtn = $('.btn-toggle-play');
 const playlist = $(".playlist");
 const progress = $('#progress');
 
+const nextBtn = $('.btn-next');
+const nextPre = $('.btn-prev');
+
 const app = {
   cureentIndex: 0,
   isPlaying : false,
@@ -161,6 +164,18 @@ const app = {
             audio.currentTime = seekTime;
         }
 
+
+        // khi next song
+        nextBtn.onclick = function () {
+            _this.nextSong();
+            audio.play();
+        }
+        // khi prev song
+        nextPre.onclick = function () {
+            _this.prevSong();
+            audio.play();
+        }
+
     }
 
   },
@@ -169,6 +184,22 @@ const app = {
     cdThumb.style.backgroundImage = `url('${this.curreentSong.image}')`;
     audio.src = this.curreentSong.path;
   },
+  nextSong : function () {
+        this.cureentIndex++;
+    if (this.cureentIndex >= this.songs.length) {
+        this.cureentIndex = 0;
+    }
+    this.loadCureentSong();
+
+  },
+  prevSong : function () {
+    this.cureentIndex--;
+    if (this.cureentIndex < 0) {
+        this.cureentIndex = this.songs.length - 1;
+    }
+    this.loadCureentSong();
+  },
+  
   start: function () {
     // định nghĩa các thuộc tính của object
     this.defineProperties();
