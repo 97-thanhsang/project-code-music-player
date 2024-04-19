@@ -30,10 +30,12 @@ const progress = $('#progress');
 
 const nextBtn = $('.btn-next');
 const nextPre = $('.btn-prev');
+const randomBtn = $('.btn-random');
 
 const app = {
   cureentIndex: 0,
   isPlaying : false,
+  isRandom : false,
   songs: [
     {
       name: "Click Pow Get Down",
@@ -167,13 +169,31 @@ const app = {
 
         // khi next song
         nextBtn.onclick = function () {
-            _this.nextSong();
+            if (_this.isRandom) {
+                _this.playRandomSong();
+            }
+            else
+            {
+                _this.nextSong();
+            }
             audio.play();
         }
         // khi prev song
         nextPre.onclick = function () {
-            _this.prevSong();
+            if (_this.isRandom) {
+                _this.playRandomSong();
+            }
+            else
+            {
+                _this.prevSong();
+            }
             audio.play();
+        }
+
+        // xử lý bật / tắt random
+        randomBtn.onclick = function (e) {
+            _this.isRandom = !_this.isRandom;
+            randomBtn.classList.toggle('active',_this.isRandom);
         }
 
     }
@@ -184,7 +204,7 @@ const app = {
     cdThumb.style.backgroundImage = `url('${this.curreentSong.image}')`;
     audio.src = this.curreentSong.path;
   },
-  nextSong : function () {
+  nextSong: function () {
         this.cureentIndex++;
     if (this.cureentIndex >= this.songs.length) {
         this.cureentIndex = 0;
@@ -199,7 +219,17 @@ const app = {
     }
     this.loadCureentSong();
   },
-  
+  playRandomSong : function () {
+    let newIndex;
+    do{
+        newIndex = Math.floor(Math.random() * this.songs.length);
+    } while (newIndex === this.cureentIndex)
+
+    this.cureentIndex = newIndex;
+
+    this.loadCureentSong();
+
+  },
   start: function () {
     // định nghĩa các thuộc tính của object
     this.defineProperties();
