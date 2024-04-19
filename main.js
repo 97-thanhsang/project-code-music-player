@@ -179,6 +179,7 @@ const app = {
       }
       audio.play();
       _this.render();
+      _this.scrollToActiveSong();
     };
     // khi prev song
     prevBtn.onclick = function () {
@@ -189,6 +190,8 @@ const app = {
       }
       audio.play();
       _this.render();
+      _this.scrollToActiveSong();
+
     };
 
     // xử lý bật / tắt random
@@ -214,6 +217,14 @@ const app = {
         repeatBtn.classList.toggle('active',_this.isRepeat);
     }
 
+  },
+  scrollToActiveSong: function () {
+    setTimeout(() => {
+        $('.song.active').scrollIntoView({
+            behavior: 'smooth',
+            block : 'end'
+        });
+    }, 200);
   },
   loadCureentSong:function(){
     heading.textContent = this.curreentSong.name;
