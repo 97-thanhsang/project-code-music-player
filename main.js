@@ -29,18 +29,20 @@ const playlist = $(".playlist");
 const progress = $('#progress');
 
 const nextBtn = $('.btn-next');
-const nextPre = $('.btn-prev');
+const prevBtn = $('.btn-prev');
 const randomBtn = $('.btn-random');
+const repeatBtn = $('.btn-repeat');
 
 const app = {
   cureentIndex: 0,
   isPlaying : false,
   isRandom : false,
+  isRepeat : false,
   songs: [
     {
       name: "Click Pow Get Down",
       singer: "Raftaar x Fortnite",
-      path: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
+      path: "https://commondatastorage.googleapis.com/codeskulptor-demos/DDR_assets/Kangaroo_MusiQue_-_The_Neverwritten_Role_Playing_Game.mp3",
       image: "https://i.ytimg.com/vi/jTLhQf5KJSc/maxresdefault.jpg",
     },
     {
@@ -53,7 +55,7 @@ const app = {
     {
       name: "Naachne Ka Shaunq",
       singer: "Raftaar x Brobha V",
-      path: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
+      path: "https://commondatastorage.googleapis.com/codeskulptor-demos/riceracer_assets/music/lose.ogg",
       image: "https://i.ytimg.com/vi/QvswgfLDuPg/maxresdefault.jpg",
     },
     {
@@ -66,14 +68,14 @@ const app = {
     {
       name: "Aage Chal",
       singer: "Raftaar",
-      path: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
+      path: "https://commondatastorage.googleapis.com/codeskulptor-demos/pyman_assets/ateapill.ogg",
       image:
         "https://a10.gaanacdn.com/images/albums/72/3019572/crop_480x480_3019572.jpg",
     },
     {
       name: "Feeling You",
       singer: "Raftaar x Harjas",
-      path: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
+      path: "https://commondatastorage.googleapis.com/codeskulptor-assets/Evillaugh.ogg",
       image:
         "https://a10.gaanacdn.com/gn_img/albums/YoEWlabzXB/oEWlj5gYKz/size_xxl_1586752323.webp",
     },
@@ -108,14 +110,17 @@ const app = {
     const cdWidth = cd.offsetWidth;
 
     // xử lý cd quay / dừng
-    const cdThumbAnimate = cdThumb.animate([
+    const cdThumbAnimate = cdThumb.animate(
+      [
         {
-            transform: 'rotate(360deg)'
-        }
-    ], {
-        duration : 10000, //10s
-        iterations : Infinity
-    })
+          transform: "rotate(360deg)",
+        },
+      ],
+      {
+        duration: 10000, //10s
+        iterations: Infinity,
+      }
+    );
     cdThumbAnimate.pause();
 
     // xử lý phóng to / thu nhỏ cd
@@ -128,74 +133,83 @@ const app = {
     };
 
     // xử lý khi click play
-    playBtn.onclick = function() {
-        if (_this.isPlaying) {
-            audio.pause();
+    playBtn.onclick = function () {
+      if (_this.isPlaying) {
+        audio.pause();
+      } else {
+        audio.play();
+      }
+    };
+    // khi song play
+    audio.onplay = function () {
+      _this.isPlaying = true;
+      player.classList.add("playing");
+      cdThumbAnimate.play();
+    };
+
+    // khi song pause
+    audio.onpause = function () {
+      _this.isPlaying = false;
+      player.classList.remove("playing");
+      cdThumbAnimate.pause();
+    };
+
+    // khi tiến độ bài hát thay đổi
+    audio.ontimeupdate = function () {
+      if (audio.duration) {
+        const progressPercent = Math.floor(
+          (audio.currentTime / audio.duration) * 100
+        );
+        progress.value = progressPercent;
+      }
+    };
+
+    // xử lý khi tua song
+    progress.onchange = function (e) {
+      const seekTime = (audio.duration / 100) * e.target.value;
+      audio.currentTime = seekTime;
+    };
+
+    // khi next song
+    nextBtn.onclick = function () {
+      if (_this.isRandom) {
+        _this.playRandomSong();
+      } else {
+        _this.nextSong();
+      }
+      audio.play();
+    };
+    // khi prev song
+    prevBtn.onclick = function () {
+      if (_this.isRandom) {
+        _this.playRandomSong();
+      } else {
+        _this.prevSong();
+      }
+      audio.play();
+    };
+
+    // xử lý bật / tắt random
+    randomBtn.onclick = function (e) {
+      _this.isRandom = !_this.isRandom;
+      randomBtn.classList.toggle("active", _this.isRandom);
+    };
+
+    // xử lý next song khi audio ended
+    audio.onended = function () {
+        if (_this.isRepeat) {
+            audio.play();
         }
         else
         {
-            audio.play();    
+            nextBtn.click();
         }
+    };
 
-        // khi song play 
-        audio.onplay = function(){
-            _this.isPlaying = true;
-            player.classList.add('playing');
-            cdThumbAnimate.play();
-        }
-
-        // khi song pause
-        audio.onpause = function() {
-            _this.isPlaying = false;
-            player.classList.remove('playing');
-            cdThumbAnimate.pause();
-
-        }
-
-        // khi tiến độ bài hát thay đổi
-        audio.ontimeupdate = function () {
-            if (audio.duration) {
-                const progressPercent = Math.floor(audio.currentTime / audio.duration * 100);
-                progress.value = progressPercent;
-            }
-        }
-
-        // xử lý khi tua song
-        progress.onchange = function (e) {
-            const seekTime = audio.duration / 100 * e.target.value;
-            audio.currentTime = seekTime;
-        }
-
-
-        // khi next song
-        nextBtn.onclick = function () {
-            if (_this.isRandom) {
-                _this.playRandomSong();
-            }
-            else
-            {
-                _this.nextSong();
-            }
-            audio.play();
-        }
-        // khi prev song
-        nextPre.onclick = function () {
-            if (_this.isRandom) {
-                _this.playRandomSong();
-            }
-            else
-            {
-                _this.prevSong();
-            }
-            audio.play();
-        }
-
-        // xử lý bật / tắt random
-        randomBtn.onclick = function (e) {
-            _this.isRandom = !_this.isRandom;
-            randomBtn.classList.toggle('active',_this.isRandom);
-        }
-
+    // xử lý lập lại song
+    repeatBtn.onclick = function () {
+        _this.isRepeat = !this.isRepeat;
+        repeatBtn.classList.toggle('active',_this.isRepeat);
     }
 
   },
@@ -204,7 +218,7 @@ const app = {
     cdThumb.style.backgroundImage = `url('${this.curreentSong.image}')`;
     audio.src = this.curreentSong.path;
   },
-  nextSong: function () {
+  nextSong:function () {
         this.cureentIndex++;
     if (this.cureentIndex >= this.songs.length) {
         this.cureentIndex = 0;
@@ -212,7 +226,7 @@ const app = {
     this.loadCureentSong();
 
   },
-  prevSong : function () {
+  prevSong:function () {
     this.cureentIndex--;
     if (this.cureentIndex < 0) {
         this.cureentIndex = this.songs.length - 1;
