@@ -14,6 +14,8 @@
 const $ = document.querySelector.bind(document);
 const $$ = document.querySelectorAll.bind(document);
 
+const PLAYER_STORAGE_KEY = 'NTS';
+
 const heading = $('header h2');
 
 const player = $('.player');
@@ -38,6 +40,11 @@ const app = {
   isPlaying : false,
   isRandom : false,
   isRepeat : false,
+  config : JSON.stringify(localStorage.getItem(PLAYER_STORAGE_KEY) || {}),
+  setConfig: function (key,value) {
+    this.config[key] = value;
+    localStorage.setItem(PLAYER_STORAGE_KEY,this.config);
+  },
   songs: [
     {
       name: "Click Pow Get Down",
@@ -83,7 +90,7 @@ const app = {
   render: function () {
     const htmls = this.songs.map((song,index) => {
       return `
-            <div class="song ${index === this.cureentIndex ? 'active' : ''}">
+            <div class="song ${index === this.cureentIndex ? 'active' : ''}" data-index="${index}">
             <div class="thumb" style="background-image: url('${song.image}')">
             </div>
             <div class="body">
@@ -197,7 +204,16 @@ const app = {
     // xử lý bật / tắt random
     randomBtn.onclick = function (e) {
       _this.isRandom = !_this.isRandom;
+      _this.setConfig('isRandom',_this.isRandom);
       randomBtn.classList.toggle("active", _this.isRandom);
+    };
+
+    // xử lý lập lại song
+    repeatBtn.onclick = function () {
+        _this.isRepeat = !this.isRepeat;
+        _this.setConfig('isRepeat',_this.isRepeat);
+
+        repeatBtn.classList.toggle('active',_this.isRepeat);
     };
 
     // xử lý next song khi audio ended
@@ -211,11 +227,33 @@ const app = {
         }
     };
 
-    // xử lý lập lại song
-    repeatBtn.onclick = function () {
-        _this.isRepeat = !this.isRepeat;
-        repeatBtn.classList.toggle('active',_this.isRepeat);
-    }
+
+
+    // lắng nghe hành vi click vào playlisst
+    playlist.onclick = function (e) {
+        const songNode = e.target.closest('.song:not(.active)');
+        if (
+            songNode
+             ||
+            e.target.closest('.option')                
+        ) {
+            // xử lý click vào song
+            if (songNode) {
+                // console.log(songNode.getAttribute('data-index'))
+                console.log(songNode.dataset.index);
+                _this.cureentIndex = Number(songNode.dataset.index);
+                _this.loadCureentSong();
+                _this.render();
+                audio.play();
+
+            }
+
+            // xử lý click vào option
+            if (e.target.closest('.option')  ) {
+                
+            }
+        }
+    };
 
   },
   scrollToActiveSong: function () {
