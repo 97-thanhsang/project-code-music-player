@@ -102,6 +102,17 @@ const app = {
     const _this = this;
     const cdWidth = cd.offsetWidth;
 
+    // xử lý cd quay / dừng
+    const cdThumbAnimate = cdThumb.animate([
+        {
+            transform: 'rotate(360deg)'
+        }
+    ], {
+        duration : 10000, //10s
+        iterations : Infinity
+    })
+    cdThumbAnimate.pause();
+
     // xử lý phóng to / thu nhỏ cd
     document.onscroll = function () {
       const scrollTop = window.scrollY || document.documentElement.scrollTop;
@@ -125,12 +136,14 @@ const app = {
         audio.onplay = function(){
             _this.isPlaying = true;
             player.classList.add('playing');
+            cdThumbAnimate.play();
         }
 
         // khi song pause
         audio.onpause = function() {
             _this.isPlaying = false;
             player.classList.remove('playing');
+            cdThumbAnimate.pause();
 
         }
 
