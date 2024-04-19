@@ -50,14 +50,7 @@ const app = {
       path: "https://mp3.vlcmusic.com/download.php?track_id=25791&format=320",
       image:
         "https://a10.gaanacdn.com/images/albums/72/3019572/crop_480x480_3019572.jpg",
-    },
-    {
-      name: "Damn",
-      singer: "Raftaar x kr$na",
-      path: "https://mp3.filmisongs.com/go.php?id=Damn%20Song%20Raftaar%20Ft%20KrSNa.mp3",
-      image:
-        "https://filmisongs.xyz/wp-content/uploads/2020/07/Damn-Song-Raftaar-KrNa.jpg",
-    },
+    },    
     {
       name: "Feeling You",
       singer: "Raftaar x Harjas",
@@ -84,7 +77,20 @@ const app = {
     });
     playlist.innerHTML = htmls.join("");
   },
+  handleEvents : function(){
+    const cd = $('.cd');
+    const cdWidth = cd.offsetWidth;
+
+    document.onscroll = function(){
+        const scrollTop = window.scrollY || document.documentElement.scrollTop;
+        const newCdWidth = cdWidth - scrollTop;
+        cd.style.width = newCdWidth > 0 ? newCdWidth + 'px' : 0;
+        cd.style.opacity = newCdWidth / cdWidth;
+        // console.log(newCdWidth);
+    }
+  },
   start: function () {
+    this.handleEvents();
     this.render();
   },
 };
