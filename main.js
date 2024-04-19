@@ -40,11 +40,12 @@ const app = {
   isPlaying : false,
   isRandom : false,
   isRepeat : false,
-  config : JSON.stringify(localStorage.getItem(PLAYER_STORAGE_KEY) || {}),
+  config : JSON.parse(localStorage.getItem(PLAYER_STORAGE_KEY)) || {},
   setConfig: function (key,value) {
     this.config[key] = value;
-    localStorage.setItem(PLAYER_STORAGE_KEY,this.config);
+    localStorage.setItem(PLAYER_STORAGE_KEY,JSON.stringify(this.config));
   },
+  
   songs: [
     {
       name: "Click Pow Get Down",
@@ -210,9 +211,8 @@ const app = {
 
     // xử lý lập lại song
     repeatBtn.onclick = function () {
-        _this.isRepeat = !this.isRepeat;
+        _this.isRepeat = !_this.isRepeat;
         _this.setConfig('isRepeat',_this.isRepeat);
-
         repeatBtn.classList.toggle('active',_this.isRepeat);
     };
 
@@ -269,6 +269,10 @@ const app = {
     cdThumb.style.backgroundImage = `url('${this.curreentSong.image}')`;
     audio.src = this.curreentSong.path;
   },
+  loadConfig: function () {
+    this.isRandom = this.config.isRandom;
+    this.isRepeat = this.config.isRepeat;
+  },
   nextSong:function () {
         this.cureentIndex++;
     if (this.cureentIndex >= this.songs.length) {
@@ -296,6 +300,9 @@ const app = {
 
   },
   start: function () {
+    // gắn cấu hình từ config vào object app
+    this.loadConfig();
+
     // định nghĩa các thuộc tính của object
     this.defineProperties();
 
@@ -307,6 +314,12 @@ const app = {
 
     // render playlist
     this.render();
+
+
+    // hiển thị trạng thái ban đầu của button repeat và random
+    randomBtn.classList.toggle("active", this.isRandom);
+    repeatBtn.classList.toggle('active',this.isRepeat);
+
   },
 };
 
